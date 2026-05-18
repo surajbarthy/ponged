@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ponged</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h1>Ponged</h1>
+      <p class="tagline">You just got ponged.</p>
+    </header>
+
+    <main>
+      <canvas id="game" width="900" height="520" aria-label="Pong game arena"></canvas>
+
+      <div id="overlay" class="overlay">
+        <div class="panel">
+          <h2 id="overlay-title">Ready?</h2>
+          <p id="overlay-message">First to 11 wins.</p>
+          <button id="start-btn" type="button">Play</button>
+          <div class="modes">
+            <label>
+              <input type="radio" name="mode" value="pvp" checked />
+              2 players
+            </label>
+            <label>
+              <input type="radio" name="mode" value="cpu" />
+              vs CPU
+            </label>
+          </motion>
+          </motion>
+          </div>
+          <p class="controls">
+            <span><kbd>W</kbd><kbd>S</kbd> left paddle</span>
+            <span><kbd>↑</kbd><kbd>↓</kbd> right paddle</span>
+            <span><kbd>Space</kbd> pause</span>
+          </p>
+        </motion>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <span id="score-left">0</span>
+      <span class="divider">—</span>
+      <span id="score-right">0</span>
+    </footer>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>

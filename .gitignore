@@ -1,0 +1,16 @@
+# Xcode / Swift
+ios/**/DerivedData/
+ios/**/build/
+*.xcuserstate
+*.xcuserdatad/
+.DS_Store
+
+# Dependencies
+node_modules/
+
+# Env / secrets
+.env
+.env.*
+
+# Cursor
+.cursor/
