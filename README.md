@@ -12,12 +12,14 @@ Playful async sound hits between close friends — throw, hear spatially, catch,
 
 ## Status
 
-Planning complete. **Next:** native iOS V1 (SwiftUI + AVAudioEngine + CoreMotion) under `ios/Ponged/`.
+**iOS V1** implemented under `ios/Ponged/` (SwiftUI + AVAudioEngine + CoreMotion).
 
-## Run (after iOS app exists)
+## Run
 
-1. Open `ios/Ponged/Ponged.xcodeproj` in Xcode.
-2. Run on a **physical iPhone** for gyro-based catch (simulator is limited).
+1. Open [`ios/Ponged/Ponged.xcodeproj`](ios/Ponged/Ponged.xcodeproj) in **Xcode** (full app required).
+2. Set your signing **Team**, then run on a **physical iPhone** for gyro catch.
+
+See [`ios/Ponged/README.md`](ios/Ponged/README.md) for details.
 
 ## Legacy
 
