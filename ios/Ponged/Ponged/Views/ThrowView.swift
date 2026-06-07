@@ -3,8 +3,8 @@ import SwiftUI
 struct ThrowView: View {
   @Bindable var session: GameSession
   let preset: SoundPreset
+  @EnvironmentObject private var audio: SpatialAudioEngine
   @StateObject private var motion = MotionManager()
-  @StateObject private var audio = SpatialAudioEngine()
 
   @State private var phase: ThrowPhase = .pickStart
   @State private var startCell: GridCell?
@@ -51,10 +51,7 @@ struct ThrowView: View {
       }
     }
     .onAppear { motion.startUpdates() }
-    .onDisappear {
-      motion.stopUpdates()
-      audio.stopAll()
-    }
+    .onDisappear { motion.stopUpdates() }
   }
 
   private var instruction: String {

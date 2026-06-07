@@ -1,11 +1,11 @@
 import Foundation
 
-enum PingStatus: String, Codable {
+enum PingStatus: String, Codable, Hashable {
     case sent
     case caught
 }
 
-struct ThrowVector: Codable, Equatable {
+struct ThrowVector: Codable, Equatable, Hashable {
     var pitch: Double
     var yaw: Double
     var peakAccel: Double

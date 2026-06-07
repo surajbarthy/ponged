@@ -1,6 +1,6 @@
 # Ponged — Project Context (session snapshot)
 
-**Last updated:** 2026-05-17  
+**Last updated:** 2026-05-21  
 **Repo:** https://github.com/surajbarthy/ponged  
 **Local path:** `/Users/surajbarthy/ponged`
 
@@ -31,31 +31,36 @@ Cursor plan copies may live under `~/.cursor/plans/` (`ponged_northstar_plan.md`
 
 ## V1 core mechanic (latest)
 
-1. **3×3 vertical grid** on sender and receiver.
+1. **2×3 grid** on sender and receiver (3 columns × 2 rows). Display coords: **x = −1, 0, 1**; **row 0 = ear level**, **row 1 = elevated**.
 2. **No bounce.** Path is **`start_cell` → `end_cell` on the sender’s grid only** (receiver uses same cell indices to catch).
-3. **Looping audio:** preset repeats with **`loop_gap` = 0.5 s** between plays.
-4. **Travel:** When receiver opens receive screen, sound moves slowly sender → receiver over **`travel_duration` = 10 s** across fictional **`imaginary_distance` = 50 ft** (`travel_speed` = 5 ft/s).
-5. **Catch:** Receiver **orients phone** (gyro) to align with **`end_cell`** (tap is debug fallback only).
+3. **Looping audio:** preset repeats with **`loop_gap` = 0.5 s** between plays (discrete waypoint plays during travel, not continuous pan).
+4. **Travel:** Receiver hears **5–7 discrete plays** at interpolated 3D waypoints from start → end (extra loops when row changes).
+5. **Catch:** Receiver **orients phone** (gyro) to align with **`end_cell`**; tap any cell to preview position after arrival; tap green end cell also catches (debug).
 6. **Pass-and-play** for V1 (no auth/push/backend initially).
 
-### Tunable parameters (edit in `V1_PLAN.md` → implement in `MechanicConfig.swift`)
+### Tunable parameters (`MechanicConfig.swift`)
 
 | Key | Default |
 |-----|---------|
 | `loop_gap` | 0.5 s |
-| `travel_duration` | 10 s |
+| `travel_duration` | 10 s (fiction; travel is waypoint-based) |
 | `imaginary_distance` | 50 ft |
-| `travel_speed` | 5 ft/s (derived) |
-| `grid_columns` / `grid_rows` | 3 |
+| `grid_columns` / `grid_rows` | 3 / **2** |
 | `catch_hold_duration` | 0.3 s |
 | `catch_angle_tolerance` | 15° |
-| `sender_preview_loops` | 3 |
+| `sender_preview_loops` | **1** |
+| `receiver_min_loops` | **5** |
+| `vertical_travel_min_loops` | **7** |
+| `spatial_radius` | **1.0 m** (fixed — direction only, no volume falloff) |
+| `max_azimuth_radians` / `max_elevation_radians` | **π/2** each |
 | `travel_curve` | linear |
 | `min_receiver_open_delay` | 0 s |
 
 ### V1 screens
 
-Home → Pick sound (POW/ZAP/CRASH) → Throw → Handoff → Receive → Success → return loop.
+Home → Pick sound (**Hee Hee!** / **Aaow!**) → Throw → Handoff → Receive → Success → return loop.
+
+**Debug:** Home → **HRTF Spatial Test** (3×3 grid, display −1…1 on both axes; not used in game flow).
 
 ### Throw input tiers
 
@@ -100,24 +105,50 @@ Northstar uses **“ping”** (notify) and **“throw”** (send). V1 simplifies
 | Layer | Technology |
 |-------|------------|
 | UI | SwiftUI, NavigationStack |
-| Audio | AVAudioEngine, per-cell pan, ~60fps interpolation during travel |
+| Audio | `AVAudioEngine` + `AVAudioEnvironmentNode` (HRTF) or stereo-pan fallback; bundled **MP3** presets |
 | Motion | CoreMotion (gyro catch + throw V1b) |
-| State | Observable `GameSession`, pass-and-play `Ping` in memory |
-| App path | `ios/Ponged/` (to be created by agent) |
+| State | `@StateObject` shared `SpatialAudioEngine` in `ContentView`; `GameSession` for pass-and-play |
+| App path | `ios/Ponged/` |
 
 **Not V1:** Expo, old web `index.html` canvas pong (legacy, ignore for V1).
 
 ---
 
-## Agent execution (next step)
+## Spatial audio (2026-05-21 session)
 
-User runs **single-shot Agent prompt** to build full iOS V1 without stopping. Requirements:
+### Architecture
 
-- `MechanicConfig.swift`, `SpatialAudioEngine`, `Grid3x3View`, 5 screens, pass-and-play
-- `xcodebuild` must pass
-- Do not edit `NORTHSTAR_PLAN.md`
+- **Single shared** `SpatialAudioEngine` via `.environmentObject` (avoids multiple engines fighting).
+- **HRTF mode (default):** `player → AVAudioEnvironmentNode → mainMixer`
+  - `player.sourceMode = .pointSource`
+  - `player.renderingAlgorithm = .HRTFHQ`
+  - Stereo MP3s **downmixed to mono** at load (environment only spatializes mono).
+- **Stereo Pan fallback:** `player → mixer → mainMixer` (L/R only; no height).
+- **Playback:** `scheduleBuffer` on mono PCM buffers; do **not** call `player.stop()` before schedule (HRTF crash).
+- **Travel:** discrete waypoint plays; position set before each buffer.
 
-If agent stops: `Continue. Assume yes to all permissions. Finish remaining items from V1_PLAN.`
+### Position mapping (`SpatialTable`)
+
+- Display grid coords → **direction on a 1 m sphere** (constant loudness, no distance attenuation tricks).
+- `(0,0)` → 1 m in front; `y ±1` → ±90° elevation (below / overhead).
+- Game uses **2 rows**; debug test uses **3 rows** (−1, 0, 1 on y).
+
+### Key files
+
+| File | Role |
+|------|------|
+| `Audio/SpatialAudioEngine.swift` | Engine, HRTF graph, mono preload, travel |
+| `Models/CellPanPosition.swift` | `SpatialTable` 3D mapping |
+| `Models/MechanicConfig.swift` | Tunables |
+| `Views/SpatialDebugView.swift` | 3×3 HRTF test grid |
+| `Resources/Sounds/` | `hee_hee.mp3`, `aaow.mp3` |
+
+### Open / next session
+
+- **Validate HRTF height on physical iPhone + headphones** (speaker won’t work).
+- User still struggled to **differentiate position** — volume falloff from `y=20` meters was fixed via sphere mapping; retest needed.
+- Consider `.automatic` rendering algorithm or **PHASE** if AVAudio HRTF remains weak.
+- Paired playtesting per `V1_PLAN.md` validation table not started.
 
 **Gyro:** Test on a **physical iPhone**; simulator is limited for catch.
 
@@ -142,8 +173,8 @@ If agent stops: `Continue. Assume yes to all permissions. Finish remaining items
 2. Storyboard integrated as canonical UX.
 3. Northstar preserved separately; V1 scoped for mechanic-only test.
 4. Core mechanic refined: grid, no bounce, looping sound, slow travel, phone-orientation catch.
-5. Build advice: Swift + phased or one-shot agent prompts.
-6. User requested CONTEXT.md + git push before iOS build → this commit.
+5. iOS V1 scaffolded: SwiftUI screens, synthesized SFX, pass-and-play loop.
+6. **2026-05-21:** Real MP3s, HRTF spatial engine, 2×3 game grid, 3×3 debug grid, mono downmix, fixed-radius sphere positioning, receiver cell-tap preview. Paused before HRTF height validation on device.
 
 ---
 

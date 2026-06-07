@@ -12,7 +12,7 @@ Playful async sound hits between close friends — throw, hear spatially, catch,
 
 ## Status
 
-**iOS V1** implemented under `ios/Ponged/` (SwiftUI + AVAudioEngine + CoreMotion).
+**iOS V1** under `ios/Ponged/` (SwiftUI + AVAudioEngine + CoreMotion). Core loop works pass-and-play. **Spatial HRTF height** is in progress — use headphones + **HRTF Spatial Test** on Home. See `docs/CONTEXT.md` for session snapshot (updated 2026-05-21).
 
 ## Run
 

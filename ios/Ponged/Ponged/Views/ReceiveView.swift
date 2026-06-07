@@ -5,12 +5,13 @@ struct ReceiveView: View {
   @Bindable var session: GameSession
   var onCaught: () -> Void
 
+  @EnvironmentObject private var audio: SpatialAudioEngine
   @StateObject private var motion = MotionManager()
-  @StateObject private var audio = SpatialAudioEngine()
   @StateObject private var catchTracker = CatchHoldTracker()
 
   @State private var travelArrived = false
   @State private var catchWindowOpen = false
+  @State private var aimedCell: GridCell?
 
   var body: some View {
     ZStack {
@@ -20,19 +21,24 @@ struct ReceiveView: View {
           .font(.title.bold())
         Text(travelArrived ? "Align your phone to the green cell" : "Listen… it's approaching")
           .font(.subheadline)
+        if !travelArrived {
+          Text("Headphones + HRTF — listen for height change")
+            .font(.caption)
+            .foregroundStyle(.secondary)
+        } else {
+          Text("Tap a cell to preview · aim at green to catch")
+            .font(.caption)
+            .foregroundStyle(.secondary)
+        }
 
         Grid3x3View(
+          startCell: ping.startCell,
           endCell: ping.endCell,
+          highlightCell: aimedCell,
+          pulseEndCell: catchWindowOpen,
           dimEndUntilArrival: true,
           travelArrived: travelArrived,
-          pulseEndCell: catchWindowOpen,
-          onCellTap: { cell in
-            if cell == ping.endCell && catchWindowOpen {
-              session.debugTapCatchCount += 1
-              print("[Ponged] debug tap catch count=\(session.debugTapCatchCount)")
-              finishCatch()
-            }
-          }
+          onCellTap: catchWindowOpen ? handleCellTap : nil
         )
 
         if catchTracker.isHolding {
@@ -49,8 +55,8 @@ struct ReceiveView: View {
       motion.stopUpdates()
       audio.stopAll()
     }
-    .onChange(of: motion.pitch) { _, _ in evaluateCatch() }
-    .onChange(of: motion.yaw) { _, _ in evaluateCatch() }
+    .onChange(of: motion.pitch) { _, _ in updateMotion() }
+    .onChange(of: motion.yaw) { _, _ in updateMotion() }
     .onChange(of: catchTracker.isHolding) { _, holding in
       if holding { finishCatch() }
     }
@@ -63,12 +69,23 @@ struct ReceiveView: View {
         travelArrived = true
         catchWindowOpen = true
         catchTracker.reset()
+        updateMotion()
       }
     }
   }
 
-  private func evaluateCatch() {
+  private func handleCellTap(_ cell: GridCell) {
+    audio.playOnce(preset: ping.preset, at: cell)
+    if cell == ping.endCell {
+      session.debugTapCatchCount += 1
+      print("[Ponged] debug tap catch count=\(session.debugTapCatchCount)")
+      finishCatch()
+    }
+  }
+
+  private func updateMotion() {
     guard catchWindowOpen else { return }
+    aimedCell = CatchDetector.aimedCell(pitch: motion.pitch, yaw: motion.yaw)
     catchTracker.update(pitch: motion.pitch, yaw: motion.yaw, target: ping.endCell)
   }
 

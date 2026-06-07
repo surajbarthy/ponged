@@ -42,10 +42,15 @@ isProject: false
 | `imaginary_distance` | **50** | feet | Fictionally how far apart the two phones are |
 | `travel_speed` | **5** | ft/s | Derived: `imaginary_distance / travel_duration` |
 | `grid_columns` | **3** | cells | Horizontal grid size |
-| `grid_rows` | **3** | cells | Vertical grid size |
+| `grid_rows` | **2** | cells | Vertical grid size (row 0 = ear level, row 1 = elevated) |
 | `catch_hold_duration` | **0.3** | seconds | How long receiver must hold correct orientation to catch |
 | `catch_angle_tolerance` | **15** | degrees | Gyro tolerance for “aligned” with target cell |
-| `sender_preview_loops` | **3** | count | Optional loops on sender after throw (uses `loop_gap`) |
+| `sender_preview_loops` | **1** | count | Loops on sender after throw (uses `loop_gap`) |
+| `receiver_min_loops` | **5** | count | Waypoint plays during horizontal travel |
+| `vertical_travel_min_loops` | **7** | count | Waypoint plays when start/end rows differ |
+| `spatial_radius` | **1.0** | meters | All HRTF sources on this sphere (constant loudness) |
+| `max_azimuth_radians` | **π/2** | radians | Display x ±1 → ±90° |
+| `max_elevation_radians` | **π/2** | radians | Display y ±1 → ±90° |
 | `travel_curve` | **linear** | enum | `linear` \| `easeInOut` — spatial interpolation over travel |
 | `min_receiver_open_delay` | **0** | seconds | Delay before travel starts after receive screen mounts |
 
@@ -100,7 +105,7 @@ There is **no bounce** between cells — only a single segment from `start_cell`
 
 ### Throw (sender)
 
-1. Pick preset (`POW!`, `ZAP!`, `CRASH!`).
+1. Pick preset (`Hee Hee!`, `Aaow!`).
 2. **Throw screen** — sender’s 3×3 grid.
 3. Throw gesture → gyro → **`start_cell`**.
 4. Same motion (or throw vector) → **`end_cell`** on **sender grid** (must differ from start; clamp to valid cell).
@@ -176,7 +181,7 @@ end_cell = neighbor_steps(start_cell, direction_from_gyro, step_count=1 or 2)
 type GridCell = { col: 0 | 1 | 2; row: 0 | 1 | 2 };
 
 type Ping = {
-  presetKey: 'pow' | 'zap' | 'crash';
+  presetKey: 'hee_hee' | 'aaow';
   startCell: GridCell;   // sender grid
   endCell: GridCell;     // sender grid (receiver uses same indices)
   throwVector?: { pitch: number; yaw: number; peakAccel: number };
@@ -190,17 +195,23 @@ type Ping = {
 
 ---
 
-## Spatial audio (V1)
+## Spatial audio (V1 — implemented 2026-05-21)
 
-| Technique | V1 |
-|-----------|-----|
-| **9 cell pan table** | Fixed L/R (+ optional height) per `(col, row)` |
-| **Looping** | Replay preset every `sound_duration + loop_gap` |
-| **Travel** | Slow pan/gain interpolation over `travel_duration` |
-| **Distance** | Attenuate by `d / imaginary_distance` during travel |
+| Technique | Implementation |
+|-----------|----------------|
+| **Cell position table** | `SpatialTable`: display coords → direction on **1 m sphere** |
+| **Presets** | Bundled MP3s (`hee_hee`, `aaow`); downmixed to **mono** for HRTF |
+| **Output** | `AVAudioEnvironmentNode` + **HRTFHQ** (default); stereo-pan fallback |
+| **Looping / travel** | **Discrete waypoint plays** (5–7) with `loop_gap`; not continuous pan |
+| **Volume** | **No distance tricks** — fixed radius so only direction changes |
+| **Debug** | Home → **HRTF Spatial Test** (3×3, coords −1…1); game stays 2×3 |
 | **Bounces** | **None** |
 
-**Platform:** Native iOS or Expo + native module if pan during 10 s travel feels stepped.
+**Requires headphones** for height. Test on physical iPhone.
+
+### Pause point (2026-05-21)
+
+HRTF height differentiation still needs **device validation** after mono downmix + sphere mapping fixes. See `docs/CONTEXT.md` for architecture notes and next steps.
 
 ---
 

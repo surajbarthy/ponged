@@ -4,6 +4,8 @@ struct HomeView: View {
   @Bindable var session: GameSession
   var onPlay: () -> Void
 
+  @State private var showSpatialDebug = false
+
   var body: some View {
     ZStack {
       Color.yellow.ignoresSafeArea()
@@ -20,7 +22,14 @@ struct HomeView: View {
           .buttonStyle(.borderedProminent)
           .tint(.red)
           .disabled(session.playerName.trimmingCharacters(in: .whitespaces).isEmpty)
+
+        Button("HRTF Spatial Test") { showSpatialDebug = true }
+          .font(.caption)
+          .foregroundStyle(.secondary)
       }
+    }
+    .sheet(isPresented: $showSpatialDebug) {
+      SpatialDebugView()
     }
   }
 }

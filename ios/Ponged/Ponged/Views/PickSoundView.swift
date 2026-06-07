@@ -4,6 +4,8 @@ struct PickSoundView: View {
   var recipientHint: String?
   var onPick: (SoundPreset) -> Void
 
+  @EnvironmentObject private var audio: SpatialAudioEngine
+
   var body: some View {
     ZStack {
       Color(red: 1, green: 0.92, blue: 0.4).ignoresSafeArea()
@@ -16,7 +18,7 @@ struct PickSoundView: View {
             .font(.title.bold())
         }
         ForEach(SoundPreset.allCases) { preset in
-          Button(preset.displayName) { onPick(preset) }
+          Button(preset.displayName) { pick(preset) }
             .font(.title.bold())
             .frame(maxWidth: .infinity)
             .padding()
@@ -26,6 +28,14 @@ struct PickSoundView: View {
         }
       }
       .padding()
+    }
+  }
+
+  private func pick(_ preset: SoundPreset) {
+    audio.playOnce(preset: preset, at: GridCell.center)
+    let wait = audio.duration(for: preset)
+    DispatchQueue.main.asyncAfter(deadline: .now() + wait) {
+      onPick(preset)
     }
   }
 }

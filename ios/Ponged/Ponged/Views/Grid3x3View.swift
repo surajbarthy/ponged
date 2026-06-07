@@ -48,7 +48,7 @@ struct Grid3x3View: View {
           .font(.caption.bold())
           .foregroundStyle(.primary)
       }
-      .frame(width: 72, height: 72)
+      .frame(width: 88, height: 72)
       .scaleEffect(pulseEndCell && isEnd && endVisible ? 1.08 : 1)
       .animation(pulseEndCell ? .easeInOut(duration: 0.5).repeatForever(autoreverses: true) : .default, value: pulseEndCell)
     }

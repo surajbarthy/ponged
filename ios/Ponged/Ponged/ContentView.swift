@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ContentView: View {
   @State private var session = GameSession()
+  @StateObject private var audio = SpatialAudioEngine()
   @State private var path = NavigationPath()
 
   var body: some View {
@@ -37,5 +38,6 @@ struct ContentView: View {
         }
       }
     }
+    .environmentObject(audio)
   }
 }

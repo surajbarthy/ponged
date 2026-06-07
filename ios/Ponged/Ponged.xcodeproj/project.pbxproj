@@ -26,7 +26,10 @@
 		B10000000000000000000011 /* ReceiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10000000000000000000011 /* ReceiveView.swift */; };
 		B10000000000000000000012 /* SuccessView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10000000000000000000012 /* SuccessView.swift */; };
 		B10000000000000000000013 /* Grid3x3View.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10000000000000000000013 /* Grid3x3View.swift */; };
+		B10000000000000000000017 /* SpatialDebugView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10000000000000000000018 /* SpatialDebugView.swift */; };
 		B10000000000000000000014 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F10000000000000000000014 /* Assets.xcassets */; };
+		B10000000000000000000015 /* hee_hee.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = F10000000000000000000016 /* hee_hee.mp3 */; };
+		B10000000000000000000016 /* aaow.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = F10000000000000000000017 /* aaow.mp3 */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -52,6 +55,9 @@
 		F10000000000000000000013 /* Grid3x3View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Grid3x3View.swift; sourceTree = "<group>"; };
 		F10000000000000000000014 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F10000000000000000000015 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		F10000000000000000000016 /* hee_hee.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = hee_hee.mp3; sourceTree = "<group>"; };
+		F10000000000000000000017 /* aaow.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = aaow.mp3; sourceTree = "<group>"; };
+		F10000000000000000000018 /* SpatialDebugView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpatialDebugView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -84,6 +90,7 @@
 				D10000000000000000000007 /* Session */,
 				D10000000000000000000008 /* Views */,
 				F10000000000000000000014 /* Assets.xcassets */,
+				D10000000000000000000009 /* Resources */,
 				F10000000000000000000015 /* Info.plist */,
 			);
 			path = Ponged;
@@ -135,6 +142,23 @@
 			path = Session;
 			sourceTree = "<group>";
 		};
+		D10000000000000000000009 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				D10000000000000000000010 /* Sounds */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		D10000000000000000000010 /* Sounds */ = {
+			isa = PBXGroup;
+			children = (
+				F10000000000000000000016 /* hee_hee.mp3 */,
+				F10000000000000000000017 /* aaow.mp3 */,
+			);
+			path = Sounds;
+			sourceTree = "<group>";
+		};
 		D10000000000000000000008 /* Views */ = {
 			isa = PBXGroup;
 			children = (
@@ -145,6 +169,7 @@
 				F10000000000000000000011 /* ReceiveView.swift */,
 				F10000000000000000000012 /* SuccessView.swift */,
 				F10000000000000000000013 /* Grid3x3View.swift */,
+				F10000000000000000000018 /* SpatialDebugView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -208,6 +233,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				B10000000000000000000014 /* Assets.xcassets in Resources */,
+				B10000000000000000000015 /* hee_hee.mp3 in Resources */,
+				B10000000000000000000016 /* aaow.mp3 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -237,6 +264,7 @@
 				B10000000000000000000011 /* ReceiveView.swift in Sources */,
 				B10000000000000000000012 /* SuccessView.swift in Sources */,
 				B10000000000000000000013 /* Grid3x3View.swift in Sources */,
+				B10000000000000000000017 /* SpatialDebugView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -288,8 +316,9 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
-				GENERATE_INFOPLIST_FILE = NO;
+				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Ponged/Info.plist;
+				INFOPLIST_KEY_NSMotionUsageDescription = "Ponged uses motion to throw sounds and catch incoming pings by aiming your phone at the grid.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
@@ -313,8 +342,9 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
-				GENERATE_INFOPLIST_FILE = NO;
+				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Ponged/Info.plist;
+				INFOPLIST_KEY_NSMotionUsageDescription = "Ponged uses motion to throw sounds and catch incoming pings by aiming your phone at the grid.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
